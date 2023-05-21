@@ -23,7 +23,7 @@ namespace CmdBash
 
 		private void Install_Load(object sender, EventArgs e)
 		{
-			myPath.Text = MyProgram.getPath();
+			myPath.Text = MyProgram.GetMYPath();
 			InstallCheckBox.Visible = false;
 			InstallCheckBox.Checked = MyProgram.isInstalled();
 			InstallCheckBox.Visible = true;
@@ -75,15 +75,15 @@ namespace CmdBash
 
 	class MyProgram
 	{
-		public static string getPath() {
+		public static string GetMYPath() {
 			string path =Application.ExecutablePath;
 			string directoryName = Path.GetDirectoryName(path);
 
 			return directoryName;
 		}
 		public static bool isInstalled() {
-			string myPath = getPath();
-			string pathVariable = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User);
+			string myPath = GetMYPath();
+			string pathVariable = GetPath();
 			if (!pathVariable.Split(';').Contains(myPath))
 			{
 				return false;
@@ -101,17 +101,17 @@ namespace CmdBash
 				return true;
 			}
 			// Путь, который нужно добавить в переменную среды Path
-			string pathToAdd = getPath();
+			string pathToAdd = GetMYPath();
 
 			// Получаем текущее значение переменной среды Path
-			string pathVariable = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User);
+			string pathVariable = GetPath();
 
 			// Проверяем, не содержит ли переменная среды Path уже добавляемый путь
 			if (!pathVariable.Split(';').Contains(pathToAdd))
 			{
 				// Добавляем путь в переменную среды Path
 				string newPathVariable = string.Join(";", pathVariable, pathToAdd);
-				Environment.SetEnvironmentVariable("Path", newPathVariable, EnvironmentVariableTarget.User);
+				SetPath(newPathVariable);
 			}
 			if (isInstalled()) {
 				return true;
@@ -125,8 +125,8 @@ namespace CmdBash
 			{
 				return true;
 			}
-			string pathToRemove = getPath(); // путь, который нужно удалить
-			string pathVariable = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User);
+			string pathToRemove = GetMYPath(); // путь, который нужно удалить
+			string pathVariable = GetPath();
 			string[] paths = pathVariable.Split(';'); // разделяем строку на массив путей
 
 			List<string> newPaths = new List<string>(); // создаем новый список путей
@@ -140,14 +140,21 @@ namespace CmdBash
 			}
 
 			string newPathVariable = string.Join(";", newPaths); // объединяем новый список путей в строку с разделителем ";"
-
-			Environment.SetEnvironmentVariable("Path", newPathVariable, EnvironmentVariableTarget.User);
+			SetPath(newPathVariable);
 
 			if (isInstalled())
 			{
 				return false;
 			}
 			return true;
+		}
+
+		private static void SetPath(string paths) {
+			Environment.SetEnvironmentVariable("Path", paths, EnvironmentVariableTarget.User);
+		}
+		private static string GetPath()
+		{
+			return Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User);
 		}
 	}
 
