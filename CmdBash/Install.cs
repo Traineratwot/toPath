@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -23,9 +23,9 @@ namespace CmdBash
 
 		private void Install_Load(object sender, EventArgs e)
 		{
-			myPath.Text = MyProgram.GetMYPath();
+			myPath.Text = Path.GetMYPath();
 			InstallCheckBox.Visible = false;
-			InstallCheckBox.Checked = MyProgram.isInstalled();
+			InstallCheckBox.Checked = Path.isInstalled();
 			InstallCheckBox.Visible = true;
 			Swich_checBox();
 		}
@@ -51,10 +51,10 @@ namespace CmdBash
 			bool sucsess;
 			if (isChecked)
 			{
-				sucsess= MyProgram.Install();
+				sucsess= Path.Install();
 			}
 			else {
-				sucsess = MyProgram.Uninstall();
+				sucsess = Path.Uninstall();
 			}
 
 			if (sucsess)
@@ -72,90 +72,4 @@ namespace CmdBash
 			Console.WriteLine(text);
 		}
 	}
-
-	class MyProgram
-	{
-		public static string GetMYPath() {
-			string path =Application.ExecutablePath;
-			string directoryName = Path.GetDirectoryName(path);
-
-			return directoryName;
-		}
-		public static bool isInstalled() {
-			string myPath = GetMYPath();
-			string pathVariable = GetPath();
-			if (!pathVariable.Split(';').Contains(myPath))
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-		}
-
-		public static bool Install()
-		{
-			if (isInstalled())
-			{
-				return true;
-			}
-			// Путь, который нужно добавить в переменную среды Path
-			string pathToAdd = GetMYPath();
-
-			// Получаем текущее значение переменной среды Path
-			string pathVariable = GetPath();
-
-			// Проверяем, не содержит ли переменная среды Path уже добавляемый путь
-			if (!pathVariable.Split(';').Contains(pathToAdd))
-			{
-				// Добавляем путь в переменную среды Path
-				string newPathVariable = string.Join(";", pathVariable, pathToAdd);
-				SetPath(newPathVariable);
-			}
-			if (isInstalled()) {
-				return true;
-			}
-			return false;
-		}
-
-		public static bool Uninstall()
-		{
-			if (!isInstalled())
-			{
-				return true;
-			}
-			string pathToRemove = GetMYPath(); // путь, который нужно удалить
-			string pathVariable = GetPath();
-			string[] paths = pathVariable.Split(';'); // разделяем строку на массив путей
-
-			List<string> newPaths = new List<string>(); // создаем новый список путей
-
-			foreach (string path in paths)
-			{
-				if (!path.Equals(pathToRemove, StringComparison.OrdinalIgnoreCase)) // если путь не совпадает с удаляемым путем, добавляем его в новый список
-				{
-					newPaths.Add(path);
-				}
-			}
-
-			string newPathVariable = string.Join(";", newPaths); // объединяем новый список путей в строку с разделителем ";"
-			SetPath(newPathVariable);
-
-			if (isInstalled())
-			{
-				return false;
-			}
-			return true;
-		}
-
-		private static void SetPath(string paths) {
-			Environment.SetEnvironmentVariable("Path", paths, EnvironmentVariableTarget.User);
-		}
-		private static string GetPath()
-		{
-			return Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User);
-		}
-	}
-
 }
