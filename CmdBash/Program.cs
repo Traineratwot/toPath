@@ -68,9 +68,12 @@ namespace CmdBash
 
             return directoryName;
         }
-        public static bool isInstalled()
+        public static bool isInstalled(string myPath = "")
         {
-            string myPath = GetMYPath();
+            if (myPath == "")
+            {
+                myPath = GetMYPath();
+            }
             string pathVariable = GetPath();
             if (!pathVariable.Split(';').Contains(myPath))
             {
@@ -84,7 +87,7 @@ namespace CmdBash
 
         public static bool Install(string pathToAdd = "")
         {
-            if (isInstalled())
+            if (isInstalled(pathToAdd))
             {
                 return true;
             }
@@ -113,7 +116,7 @@ namespace CmdBash
 
         public static bool Uninstall(string pathToRemove = "")
         {
-            if (!isInstalled())
+            if (!isInstalled(pathToRemove))
             {
                 return true;
             }
