@@ -55,6 +55,19 @@ namespace CmdBash
                         Console.WriteLine(String.Format("Не удалось {0}", "удалить"));
                     }
                 }
+
+                if (action == "exists")
+                {
+                    bool sucsess = Path.isInstalled(folder);
+                    if (sucsess)
+                    {
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        Environment.Exit(404);
+                    }
+                }
             }
         }
 
